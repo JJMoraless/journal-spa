@@ -1,9 +1,14 @@
 import { collection, doc, setDoc } from "firebase/firestore/lite";
 import { FireStore, loadNotes } from "../../common";
-import { addNewEnptyNote, setActiveNote, setIsSavingNote, setNotes } from "./";
+import {
+  addNewEnptyNote,
+  setActiveNote,
+  setIsSavingNote,
+  setNotes,
+  updateNote,
+} from "./";
 
 export const startNewNote = () => {
-    
   return async (dispatch, getState) => {
     dispatch(setIsSavingNote());
 
@@ -15,14 +20,12 @@ export const startNewNote = () => {
       date: new Date().getTime(),
     };
 
-    const newDocRef = doc(collection(FireStore, `${uid}/journal/notes`));
-    const docCreatedRes = await setDoc(newDocRef, newNote);
-    newNote.id = newDocRef.id;
+    const notesRef = doc(collection(FireStore, `${uid}/journal/notes`));
+    await setDoc(notesRef, newNote); //*crear doc en firestore
+    newNote.id = notesRef.id;
 
     dispatch(addNewEnptyNote({ note: newNote }));
     dispatch(setActiveNote({ note: newNote }));
-
-    console.log({ newDocRef, docCreatedRes });
   };
 };
 
@@ -32,5 +35,24 @@ export const startLoadingNotes = () => {
 
     const notes = await loadNotes(uid);
     dispatch(setNotes({ notes }));
+  };
+};
+
+export const startUpdateNote = () => {
+  return async (dispatch, getState) => {
+    dispatch(setIsSavingNote());
+
+    const { uid } = getState().auth;
+    const { currentNoteActive } = getState().journal;
+
+    const newNoteToUpdate = { ...currentNoteActive };
+    delete newNoteToUpdate.id;
+
+    const pathNote = `${uid}/journal/notes/${currentNoteActive.id}`;
+    const noteRef = doc(FireStore, pathNote);
+
+    // * merge: true para que no se borren los campos que no se estan actualizando
+    await setDoc(noteRef, newNoteToUpdate, { merge: true });
+    dispatch(updateNote({ note: currentNoteActive }));
   };
 };

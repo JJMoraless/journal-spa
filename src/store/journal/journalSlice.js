@@ -19,18 +19,34 @@ export const journalSlice = createSlice({
     setIsSavingNote: (state) => {
       state.isSaving = true;
     },
+
     addNewEnptyNote: (state, { payload }) => {
       state.notes.push(payload.note);
       state.isSaving = false;
     },
+
     setActiveNote: (state, { payload }) => {
       state.currentNoteActive = payload.note;
     },
+
     setNotes: (state, { payload }) => {
       state.notes = payload.notes;
     },
+
+    updateNote: (state, { payload }) => {
+      state.isSaving = false;
+      const noteIntex = state.notes.findIndex(
+        (note) => note.id === payload.note.id
+      );
+
+      if (!noteIntex) {
+        throw new Error("Note not found");
+      }
+
+      state.notes[noteIntex] = payload.note;
+    },
+
     setSavingNote: (state, { payload }) => {},
-    updateNote: (state, { payload }) => {},
     deleteNoteById: (state, { payload }) => {},
   },
 });

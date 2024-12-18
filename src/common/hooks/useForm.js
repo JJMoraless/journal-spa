@@ -8,6 +8,10 @@ import { useEffect, useMemo, useState } from "react";
 export const useForm = (initialForm = {}, formValidator = {}) => {
   const [formState, setformState] = useState(initialForm);
 
+  /**
+   * cuando initialForm cambie se resetea el estado del formulario
+   * pero cuandose se cambie desde fuera del hook sin usar el hook
+   */
   useEffect(() => {
     setformState(initialForm);
   }, [initialForm])

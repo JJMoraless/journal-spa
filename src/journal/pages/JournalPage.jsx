@@ -18,7 +18,11 @@ export const JournalPage = () => {
 
   return (
     <JournalLayout>
-      {currentNoteActive ? <NoteView /> : <NothingSelectedVIew />}
+      {
+        currentNoteActive 
+          ? <NoteView /> 
+          : <NothingSelectedVIew />
+      }
       <IconButton
         disabled={isSaving}
         onClick={onNewNote}

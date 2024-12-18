@@ -12,7 +12,11 @@ import { useDispatch } from "react-redux";
 import { setActiveNote } from "../../store/journal";
 
 const shortStr = (title = "") => {
-  return title.length > 10 ? `${title.substring(0, 10)}...` : title;
+
+  return title.length > 10 
+    ? `${title.substring(0, 10)}...` 
+    : title;
+
 };
 
 export const SideBarItem = ({ noteItem }) => {
@@ -20,9 +24,7 @@ export const SideBarItem = ({ noteItem }) => {
   const dispatch = useDispatch();
 
   const onActivateNote = () => {
-    console.log("onActivateNote");
-
-    const note = { ...noteItem, imageUrls: [], title: `X  ${noteItem.id}` };
+    const note = { ...noteItem, imageUrls: [] };
     dispatch(setActiveNote({ note }));
   };
 

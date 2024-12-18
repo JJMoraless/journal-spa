@@ -1,4 +1,3 @@
-import { StarOutline } from "@mui/icons-material";
 import { Grid2, Typography } from "@mui/material";
 
 export const NothingSelectedVIew = () => {
