@@ -6,14 +6,14 @@ export const journalSlice = createSlice({
     isSaving: false,
     msgSaved: "",
     notes: [],
-    currentNoteActive: null,
     // currentNoteActive: {
-    //   id: "123",
+    //   id: "",
     //   title: "",
     //   body: "",
     //   date: 1234567890,
     //   imageUrls: [],
     // },
+    currentNoteActive: null
   },
   reducers: {
     setIsSavingNote: (state) => {
@@ -35,15 +35,26 @@ export const journalSlice = createSlice({
 
     updateNote: (state, { payload }) => {
       state.isSaving = false;
+      const noteToUpdate = payload.note;
       const noteIntex = state.notes.findIndex(
-        (note) => note.id === payload.note.id
+        (note) => note.id === noteToUpdate.id
       );
 
       if (!noteIntex) {
         throw new Error("Note not found");
       }
 
-      state.notes[noteIntex] = payload.note;
+      state.notes[noteIntex] = noteToUpdate;
+      state.msgSaved = `Nota: ${noteToUpdate.title}, actualizada correctamente`;
+    },
+
+    setImgsToActiveNote: (state, { payload }) => {
+      state.currentNoteActive.imageUrls = [
+        ...state.currentNoteActive.imageUrls,
+        ...payload.imgUrls,
+      ];
+
+      state.isSaving = false;
     },
 
     setSavingNote: (state, { payload }) => {},
@@ -59,4 +70,5 @@ export const {
   setSavingNote,
   updateNote,
   setIsSavingNote,
+  setImgsToActiveNote
 } = journalSlice.actions;

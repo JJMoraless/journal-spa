@@ -24,7 +24,7 @@ export const SideBarItem = ({ noteItem }) => {
   const dispatch = useDispatch();
 
   const onActivateNote = () => {
-    const note = { ...noteItem, imageUrls: [] };
+    const note = { ...noteItem };
     dispatch(setActiveNote({ note }));
   };
 

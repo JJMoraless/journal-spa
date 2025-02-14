@@ -1,10 +1,24 @@
 import SaveOutlined from "@mui/icons-material/SaveOutlined";
-import { Button, Grid2, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Grid2,
+  IconButton,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { ImageGallery } from "../components/ImageGallery";
 import { useForm } from "../../common";
 import { useDispatch, useSelector } from "react-redux";
-import { setActiveNote, startUpdateNote } from "../../store/journal";
-import { useEffect } from "react";
+import {
+  setActiveNote,
+  startUpdateNote,
+  startUploadingFile,
+} from "../../store/journal";
+import { useEffect, useRef } from "react";
+import Swal from "sweetalert2";
+
+import "sweetalert2/dist/sweetalert2.css";
+import { UploadFileOutlined } from "@mui/icons-material";
 
 const dateFromNumber = (date) => {
   const newDate = new Date(date);
@@ -14,17 +28,33 @@ const dateFromNumber = (date) => {
 export const NoteView = () => {
   const dispatch = useDispatch();
 
-  const { currentNoteActive } = useSelector((state) => state.journal);
+  const { currentNoteActive, msgSaved, isSaving } = useSelector(
+    (state) => state.journal
+  );
   const { formState, onInputChange } = useForm(currentNoteActive);
   const { title, body, date } = formState;
 
-  //* actualiza currentNoteActive en store
   useEffect(() => {
-    dispatch(setActiveNote({ note: formState }));
-  }, [formState, dispatch]);
+    if (!msgSaved.length > 0) return;
+    Swal.fire("Nota actualizada", msgSaved, "success");
+  }, [msgSaved]);
+
+  const $fileInputRef = useRef();
 
   const onUpdateNote = () => {
-    dispatch(startUpdateNote());
+    dispatch(setActiveNote({ note: formState })); //* actualiza currentNoteActive en store
+    dispatch(startUpdateNote()); //* actualiza la nota en la base de datos
+  };
+
+  /**
+   * @param { Event } event
+   */
+  const onFileChange = ({ target }) => {
+    /** @type {FileList} */
+    const files = target.files;
+    if (files.length === 0) return;
+
+    dispatch(startUploadingFile({ files }));
   };
 
   return (
@@ -42,7 +72,24 @@ export const NoteView = () => {
       </Grid2>
 
       <Grid2>
-        <Button sx={{ padding: 2 }} onClick={onUpdateNote}>
+        <IconButton
+          disabled={isSaving}
+          onClick={() => $fileInputRef.current.click()}
+        >
+          <UploadFileOutlined />
+        </IconButton>
+
+        <input
+          type="file"
+          multiple
+          onChange={onFileChange}
+          ref={$fileInputRef}
+          style={{
+            display: "none",
+          }}
+        />
+
+        <Button sx={{ padding: 2 }} onClick={onUpdateNote} disabled={isSaving}>
           <SaveOutlined sx={{ fontSize: 30, mr: 1 }} />
           Guardar
         </Button>

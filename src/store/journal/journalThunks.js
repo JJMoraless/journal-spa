@@ -3,10 +3,12 @@ import { FireStore, loadNotes } from "../../common";
 import {
   addNewEnptyNote,
   setActiveNote,
+  setImgsToActiveNote,
   setIsSavingNote,
   setNotes,
   updateNote,
 } from "./";
+import { fileUpload } from "../../common/helpers/fileUpload";
 
 export const startNewNote = () => {
   return async (dispatch, getState) => {
@@ -45,6 +47,10 @@ export const startUpdateNote = () => {
     const { uid } = getState().auth;
     const { currentNoteActive } = getState().journal;
 
+
+    console.log({currentNoteActive})
+    
+
     const newNoteToUpdate = { ...currentNoteActive };
     delete newNoteToUpdate.id;
 
@@ -54,5 +60,23 @@ export const startUpdateNote = () => {
     // * merge: true para que no se borren los campos que no se estan actualizando
     await setDoc(noteRef, newNoteToUpdate, { merge: true });
     dispatch(updateNote({ note: currentNoteActive }));
+  };
+};
+
+/**
+ * @param { { files: FileList } }
+ */
+export const startUploadingFile = ({ files }) => {
+  return async (dispatch) => {
+    dispatch(setIsSavingNote());
+
+    const fileUploadPromises = Array.from(files).map((file) =>
+      fileUpload(file)
+    );
+
+    /** @type {String[]} */
+    const imgUrls = await Promise.all(fileUploadPromises);
+
+    dispatch(setImgsToActiveNote({ imgUrls }));
   };
 };
