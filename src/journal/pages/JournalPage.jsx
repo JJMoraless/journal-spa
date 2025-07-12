@@ -11,18 +11,11 @@ import { JournalLayout } from "../layout/JournalLayout";
 export const JournalPage = () => {
   const dispatch = useDispatch();
   const { isSaving, currentNoteActive } = useSelector((state) => state.journal);
-
-  const onNewNote = () => {
-    dispatch(startNewNote());
-  };
+  const onNewNote = () => dispatch(startNewNote());
 
   return (
     <JournalLayout>
-      {
-        currentNoteActive 
-          ? <NoteView /> 
-          : <NothingSelectedVIew />
-      }
+      {currentNoteActive ? <NoteView /> : <NothingSelectedVIew />}
       <IconButton
         disabled={isSaving}
         onClick={onNewNote}
