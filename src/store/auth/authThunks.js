@@ -3,8 +3,9 @@ import {
   logOutFirebase,
   registerWithEmailPassword,
   signInWithGoogle,
-} from "../../common";
+} from "../../common/firebase";
 import { checkingCredentials, login, logOut } from ".";
+import { clearNotesOnLogout } from "../journal";
 
 export const checkingAuthentication = () => {
   return async (dispath) => {
@@ -71,6 +72,7 @@ export const startLoginWithEmailPassword = ({ email, password }) => {
 export const startLogout = () => {
   return async (dispath) => {
     await logOutFirebase();
+    dispath(clearNotesOnLogout());
     dispath(logOut());
   };
 };

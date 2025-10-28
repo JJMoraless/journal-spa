@@ -12,11 +12,7 @@ import { useDispatch } from "react-redux";
 import { setActiveNote } from "../../store/journal";
 
 const shortStr = (title = "") => {
-
-  return title.length > 10 
-    ? `${title.substring(0, 10)}...` 
-    : title;
-
+  return title.length > 10 ? `${title.substring(0, 10)}...` : title;
 };
 
 export const SideBarItem = ({ noteItem }) => {
@@ -35,8 +31,8 @@ export const SideBarItem = ({ noteItem }) => {
           <TurnedInNot />
         </ListItemIcon>
         <Grid2 container>
-          <ListItemText primary={shortStr(title || "no title")} />
-          <ListItemText secondary={body || "no body"} />
+          <ListItemText primary={shortStr(title || "Sin titulo")} />
+          <ListItemText secondary={body || "Sin Contenido"} />
         </Grid2>
       </ListItemButton>
     </ListItem>

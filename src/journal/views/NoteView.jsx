@@ -11,14 +11,13 @@ import { useForm } from "../../common";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setActiveNote,
+  startDeletingActiveNote,
   startUpdateNote,
   startUploadingFile,
 } from "../../store/journal";
-import { useEffect, useRef } from "react";
-import Swal from "sweetalert2";
-
+import { useRef } from "react";
 import "sweetalert2/dist/sweetalert2.css";
-import { UploadFileOutlined } from "@mui/icons-material";
+import { DeleteOutline, FileUpload } from "@mui/icons-material";
 
 const dateFromNumber = (date) => {
   const newDate = new Date(date);
@@ -28,16 +27,9 @@ const dateFromNumber = (date) => {
 export const NoteView = () => {
   const dispatch = useDispatch();
 
-  const { currentNoteActive, msgSaved, isSaving } = useSelector(
-    (state) => state.journal
-  );
+  const { currentNoteActive, isSaving } = useSelector((state) => state.journal);
   const { formState, onInputChange } = useForm(currentNoteActive);
   const { title, body, date } = formState;
-
-  useEffect(() => {
-    if (!msgSaved.length > 0) return;
-    Swal.fire("Nota actualizada", msgSaved, "success");
-  }, [msgSaved]);
 
   const $fileInputRef = useRef();
 
@@ -56,6 +48,10 @@ export const NoteView = () => {
 
     dispatch(startUploadingFile({ files }));
   };
+
+  const onDeleteNote = () => {
+    dispatch(startDeletingActiveNote()); 
+  }
 
   return (
     <Grid2
@@ -76,7 +72,7 @@ export const NoteView = () => {
           disabled={isSaving}
           onClick={() => $fileInputRef.current.click()}
         >
-          <UploadFileOutlined />
+          <FileUpload color="primary" />
         </IconButton>
 
         <input
@@ -90,11 +86,12 @@ export const NoteView = () => {
         />
 
         <Button sx={{ padding: 2 }} onClick={onUpdateNote} disabled={isSaving}>
-          <SaveOutlined sx={{ fontSize: 30, mr: 1 }} />
+          <SaveOutlined sx={{ fontSize: 30, mr: 1 }} color="primary" />
           Guardar
         </Button>
       </Grid2>
 
+      {/* NOTE TITLE */}
       <Grid2 container size={12}>
         <TextField
           type="text"
@@ -109,6 +106,7 @@ export const NoteView = () => {
         />
       </Grid2>
 
+      {/* NOTE CONTENT */}
       <Grid2 container size={12}>
         <TextField
           type="text"
@@ -123,9 +121,18 @@ export const NoteView = () => {
         />
       </Grid2>
 
-      {/* Image gallery */}
+      <Grid2 container justifyContent={"end"}>
+        <Button onClick={onDeleteNote} sx={{ mt: 2 }} color="error">
+          <DeleteOutline />
+          Borrar Nota
+        </Button>
+        <Grid2 />
 
-      <ImageGallery />
+        {/* NOTE IMAGES */}
+        {currentNoteActive?.imageUrls && (
+          <ImageGallery images={currentNoteActive.imageUrls} />
+        )}
+      </Grid2>
     </Grid2>
   );
 };

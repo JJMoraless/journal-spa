@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { alertMsg } from "../../common/helpers";
 
 export const journalSlice = createSlice({
   name: "journal",
@@ -13,7 +14,7 @@ export const journalSlice = createSlice({
     //   date: 1234567890,
     //   imageUrls: [],
     // },
-    currentNoteActive: null
+    currentNoteActive: null,
   },
   reducers: {
     setIsSavingNote: (state) => {
@@ -36,29 +37,46 @@ export const journalSlice = createSlice({
     updateNote: (state, { payload }) => {
       state.isSaving = false;
       const noteToUpdate = payload.note;
+
       const noteIntex = state.notes.findIndex(
         (note) => note.id === noteToUpdate.id
       );
 
-      if (!noteIntex) {
+      if (noteIntex === -1) {
         throw new Error("Note not found");
       }
 
       state.notes[noteIntex] = noteToUpdate;
-      state.msgSaved = `Nota: ${noteToUpdate.title}, actualizada correctamente`;
+      const msg = `Nota: ${noteToUpdate.title}, actualizada correctamente`;
+      alertMsg({ msg });
     },
 
     setImgsToActiveNote: (state, { payload }) => {
       state.currentNoteActive.imageUrls = [
-        ...state.currentNoteActive.imageUrls,
+        ...(state.currentNoteActive.imageUrls || []),
         ...payload.imgUrls,
       ];
 
       state.isSaving = false;
     },
 
-    setSavingNote: (state, { payload }) => {},
-    deleteNoteById: (state, { payload }) => {},
+    clearNotesOnLogout: (state) => {
+      state.isSaving = false;
+      state.msgSaved = "";
+      state.notes = [];
+      state.currentNoteActive = null;
+    },
+
+    deleteNoteById: (state, { payload: { id } }) => {
+      state.isSaving = false;
+      state.notes = state.notes.filter((note) => note.id !== id);
+
+      alertMsg( { msg: `Nota eliminada correctamente` } );
+
+      if (state.currentNoteActive?.id === id) {
+        state.currentNoteActive = null;
+      }
+    },
   },
 });
 
@@ -70,5 +88,6 @@ export const {
   setSavingNote,
   updateNote,
   setIsSavingNote,
-  setImgsToActiveNote
+  setImgsToActiveNote,
+  clearNotesOnLogout,
 } = journalSlice.actions;

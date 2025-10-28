@@ -1,14 +1,15 @@
-import { collection, doc, setDoc } from "firebase/firestore/lite";
+import { collection, deleteDoc, doc, setDoc } from "firebase/firestore/lite";
 import { FireStore, loadNotes } from "../../common";
 import {
   addNewEnptyNote,
+  deleteNoteById,
   setActiveNote,
   setImgsToActiveNote,
   setIsSavingNote,
   setNotes,
   updateNote,
 } from "./";
-import { fileUpload } from "../../common/helpers/fileUpload";
+import { uploadImgOnCloudinary } from "../../common/helpers/";
 
 export const startNewNote = () => {
   return async (dispatch, getState) => {
@@ -47,17 +48,13 @@ export const startUpdateNote = () => {
     const { uid } = getState().auth;
     const { currentNoteActive } = getState().journal;
 
-
-    console.log({currentNoteActive})
-    
-
     const newNoteToUpdate = { ...currentNoteActive };
     delete newNoteToUpdate.id;
 
     const pathNote = `${uid}/journal/notes/${currentNoteActive.id}`;
     const noteRef = doc(FireStore, pathNote);
 
-    // * merge: true para que no se borren los campos que no se estan actualizando
+    // * merge: true. para que no se borren los campos que no se estan actualizando
     await setDoc(noteRef, newNoteToUpdate, { merge: true });
     dispatch(updateNote({ note: currentNoteActive }));
   };
@@ -70,13 +67,26 @@ export const startUploadingFile = ({ files }) => {
   return async (dispatch) => {
     dispatch(setIsSavingNote());
 
-    const fileUploadPromises = Array.from(files).map((file) =>
-      fileUpload(file)
+    const imgsUploadPromises = Array.from(files).map((file) =>
+      uploadImgOnCloudinary(file)
     );
 
-    /** @type {String[]} */
-    const imgUrls = await Promise.all(fileUploadPromises);
-
+    /** @type { String[] } */
+    const imgUrls = await Promise.all(imgsUploadPromises);
     dispatch(setImgsToActiveNote({ imgUrls }));
+  };
+};
+
+export const startDeletingActiveNote = () => {
+  return async (dispatch, getState) => {
+    dispatch(setIsSavingNote());
+
+    const { uid } = getState().auth;
+    const { currentNoteActive } = getState().journal;
+
+    const refCurrentNoteActive = doc(FireStore, `${uid}/journal/notes/${currentNoteActive.id}`);
+    await deleteDoc(refCurrentNoteActive);
+
+    dispatch(deleteNoteById({ id: currentNoteActive.id }));
   };
 };

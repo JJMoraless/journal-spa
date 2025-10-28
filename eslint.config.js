@@ -3,6 +3,7 @@ import globals from 'globals'
 import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import jest from "eslint-plugin-jest";
 
 export default [
   { ignores: ['dist'] },
@@ -33,6 +34,17 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+    },
+  },
+  /* Configuración específica para archivos de test */
+  {
+    files: ["**/*.test.js", "**/*.spec.js"],
+    plugins: { jest },
+    rules: {
+      ...jest.configs.recommended.rules,
+    },
+    languageOptions: {
+      globals: jest.environments.globals.globals,
     },
   },
 ]

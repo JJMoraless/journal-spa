@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { authEnum } from "../../common";
+import { authEnum } from "../../common/enum";
 
 export const authSlice = createSlice({
   name: "auth",

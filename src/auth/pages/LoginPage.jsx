@@ -19,7 +19,7 @@ import {
 import { AuthLayout } from "../layout/AuthLayout";
 import { authEnum, useForm } from "../../common";
 
-const loginForm = {
+const loginFormData = {
   email: "",
   password: "",
 };
@@ -27,9 +27,13 @@ const loginForm = {
 export const LoginPage = () => {
   const dispatch = useDispatch();
   const { statusAuth, errorMsg } = useSelector((state) => state.auth);
-  const isAuthenticating = useMemo(() => statusAuth === authEnum.CHECKING,[statusAuth]);
 
-  const { formState, onInputChange } = useForm(loginForm);
+  const isAuthenticating = useMemo(
+    () => statusAuth === authEnum.CHECKING,
+    [statusAuth]
+  );
+
+  const { formState, onInputChange } = useForm(loginFormData);
   const { email, password } = formState;
 
   /**
